@@ -1,13 +1,14 @@
 from dataclasses import dataclass, field
-from typing import Sequence, Union
+from typing import Sequence
 
-from pyatomsk.pyatomsk.structures.atomic_structure import AtomicStructure
-from pyatomsk.pyatomsk.dislocations.dislocation import Dislocation
-from pyatomsk.pyatomsk.dislocations.dislocation_loop import DislocationLoop
+from pyatomsk.commands import AtomskCommand
+from pyatomsk.dislocations.dislocation import Dislocation
+from pyatomsk.dislocations.dislocation_loop import DislocationLoop
+from pyatomsk.structures.atomic_structure import AtomicStructure
 
 
 @dataclass
-class DislocationBuilder:
+class DislocationBuilder(AtomskCommand):
     atomic_structure: AtomicStructure
     input_file: str | None
     output_file: str | None
@@ -16,7 +17,9 @@ class DislocationBuilder:
     options: list[str] = field(default_factory=list)
 
     def to_command(self) -> str:
-        commands = [self.atomic_structure.to_command()]
+        commands = [
+            self.atomic_structure.to_command(include_export=self.output_file is None)
+        ]
 
         for dislocation in self.dislocations:
             commands.append(dislocation.to_command())

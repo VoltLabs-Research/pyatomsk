@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from typing import Sequence, Union
 
-from pyatomsk.pyatomsk.structures.lattices import CubicLattices, TetragonalLattices, HexagonalLattices
+from pyatomsk.commands import AtomskCommand
+from pyatomsk.structures.lattices import CubicLattices, TetragonalLattices, HexagonalLattices
 
 MillerIndex = Union[str, Sequence[int]]
 
 @dataclass
-class AtomicStructure:
+class AtomicStructure(AtomskCommand):
     lattice: Union[CubicLattices, TetragonalLattices, HexagonalLattices]
     lattice_params: Sequence[float]
     species: Sequence[str]
@@ -15,7 +16,7 @@ class AtomicStructure:
     export_filename: str | None = None
     formats: Sequence[str] = ()
 
-    def to_command(self) -> str:
+    def to_command(self, *, include_export: bool = True) -> str:
         args = ['atomsk', '--create', self.lattice.value]
         args.extend(map(str, self.lattice_params))
         args.extend(self.species)
@@ -28,7 +29,7 @@ class AtomicStructure:
             args.append('-duplicate')
             args.extend(map(str, self.duplicate))
 
-        if self.export_filename:
+        if include_export and self.export_filename:
             args.append(self.export_filename)
             args.extend(self.formats)
 

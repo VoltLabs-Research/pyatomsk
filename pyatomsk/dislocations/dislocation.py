@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from pyatomsk.pyatomsk.dislocations.types import Burgers, Coord
 from enum import Enum
+
+from pyatomsk.dislocations.types import Burgers, Coord
+
 
 class DislocationCharacter(Enum):
     EDGE = 'edge'
@@ -27,4 +29,3 @@ class Dislocation:
             args.append(self.poisson)
 
         return ' '.join(map(str, args))
-    
