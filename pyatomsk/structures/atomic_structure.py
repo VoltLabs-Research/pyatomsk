@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Sequence, Union
 
-from pyatomsk.structures.lattices import CubicLattices, TetragonalLattices, HexagonalLattices
+from pyatomsk.pyatomsk.structures.lattices import CubicLattices, TetragonalLattices, HexagonalLattices
 
 MillerIndex = Union[str, Sequence[int]]
 

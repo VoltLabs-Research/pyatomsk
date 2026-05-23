@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Sequence, Union
 
-from structures.atomic_structure import AtomicStructure
-from dislocations.dislocation import Dislocation
-from dislocations.dislocation_loop import DislocationLoop
+from pyatomsk.pyatomsk.structures.atomic_structure import AtomicStructure
+from pyatomsk.pyatomsk.dislocations.dislocation import Dislocation
+from pyatomsk.pyatomsk.dislocations.dislocation_loop import DislocationLoop
 
 
 @dataclass

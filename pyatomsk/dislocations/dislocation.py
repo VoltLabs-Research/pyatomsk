@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from dislocations.types import Burgers, Coord
+from pyatomsk.pyatomsk.dislocations.types import Burgers, Coord
 from enum import Enum
 
 class DislocationCharacter(Enum):

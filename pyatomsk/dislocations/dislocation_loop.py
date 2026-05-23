@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Sequence
-from dislocations.types import Coord
+from pyatomsk.pyatomsk.dislocations.types import Coord
 
 @dataclass
 class DislocationLoop:
