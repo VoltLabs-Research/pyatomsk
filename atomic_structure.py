@@ -15,7 +15,7 @@ class AtomicStructure:
     export_filename: str | None 
     formats: Sequence[str] | None
 
-    def to_command(self, formats: Sequence[str] | None = None) -> list[str]:
+    def to_command(self, formats: Sequence[str] | None = None) -> str:
         args = ['atomsk', '--create', self.lattice.value, self.lattice_params, self.species]
 
         if self.orient is not None:
