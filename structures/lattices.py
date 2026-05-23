@@ -6,7 +6,7 @@ class CubicLattices(Enum):
     BCC = 'bcc'
     CsCl = 'CsCl'
     FCC = 'fcc'
-    L12 = 'L12'git branch -M main
+    L12 = 'L12'
     FLUORITE = 'fluorite'
     DIAMOND = 'diamond'
     ZINCBLENDE = 'zb'
