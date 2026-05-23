@@ -11,3 +11,18 @@ class DislocationLoop:
     radius: float
     burgers: Sequence[float]
     poisson: float
+
+    def to_command(self) -> str:
+        args = [
+            '-dislocation',
+            'loop',
+            self.x,
+            self.y,
+            self.z,
+            self.normal,
+            self.radius,
+            *self.burgers,
+            self.poisson
+        ]
+
+        return ' '.join(map(str, args))
