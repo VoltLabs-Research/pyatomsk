@@ -42,8 +42,6 @@ view(ptm_run['atoms.msgpack'], output_path=OUT / 'ptm_atoms.glb')
 view(dxa_run['dislocations.json'])
 ```
 
-Full, runnable scripts live in [`examples/dislocations/`](examples/dislocations/)
-(`Al_FCC/` and `Martensita-BCT/`).
 
 ## Building structures
 
