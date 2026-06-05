@@ -1,1 +1,0 @@
-"""Atomic structure command builders."""
