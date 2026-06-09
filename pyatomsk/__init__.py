@@ -6,7 +6,6 @@ builders plus a thin viewer helper.
 """
 
 from voltsdk import (
-    Lattice,
     Plugin,
     PluginArtifact,
     PluginError,
@@ -23,6 +22,7 @@ from pyatomsk.dislocations import (
     DislocationCharacter,
     DislocationLoop,
 )
+from pyatomsk.patterns import Lattice
 from pyatomsk.structures import (
     AtomicStructure,
     CubicLattices,
@@ -39,7 +39,6 @@ __all__ = [
     'PluginArtifact',
     'PluginRun',
     'PluginError',
-    'Lattice',
     'SpatialAssembler',
     'open_in_volt',
     # Atomsk command builders
@@ -49,6 +48,7 @@ __all__ = [
     'CubicLattices',
     'TetragonalLattices',
     'HexagonalLattices',
+    'Lattice',
     'Dislocation',
     'DislocationCharacter',
     'DislocationLoop',

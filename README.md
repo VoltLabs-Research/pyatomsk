@@ -142,7 +142,7 @@ view(dxa_run['defect_mesh.json'], exporter='MeshExporter')      # force a specif
 | `DislocationBuilder` | Combine a structure with one or more dislocations. |
 | `AtomskCommand` | Base class: `.argv()`, `.to_command()`, `.run() -> Path`. |
 | `view(source, *, output_path=None, …)` | Open an artifact/GLB/list in the VOLT canvas. |
-| `PluginHub`, `Plugin`, `PluginRun`, `PluginArtifact`, `Lattice`, `SpatialAssembler`, `open_in_volt` | Re-exported from voltsdk. |
+| `PluginHub`, `Plugin`, `PluginRun`, `PluginArtifact`, `SpatialAssembler`, `open_in_volt` | Re-exported from voltsdk. |
 
 ## License
 
