@@ -33,6 +33,7 @@ edge = Dislocation(
     character=DislocationCharacter.EDGE_ADD,
     p1='0.501*box',
     p2='0.501*box',
+    # t = (0, 0, 1)
     line='z',
     plane='y',
     burgers=[A],
@@ -47,7 +48,6 @@ DislocationBuilder(
 
 bct = Lattice(
     name='bct',
-    matrix=True,
     coordination_number=14,
     cell=[
         [1.0, 0.0, 0.0],
@@ -72,7 +72,13 @@ dxa_run = dxa(
     reference_topology=manifest['reference_topology'],
 )
 
-print(dxa_run['dislocations.msgpack'].df('main_listing'))
+dislocations = dxa_run['dislocations.msgpack']
+
+print(dislocations.df('main_listing'))
+
+segments = dislocations.df('export.DislocationExporter.segments')
+print(segments[['segment_id', 'burgers_vector', 'magnitude', 'length']].to_string(index=False))
+
 
 view(dxa_run['dislocations.msgpack'], output_path=OUTPUT_DIR / 'dislocations.glb')
 view(dxa_run['defect_mesh.msgpack'], output_path=OUTPUT_DIR / 'defect_mesh.glb')

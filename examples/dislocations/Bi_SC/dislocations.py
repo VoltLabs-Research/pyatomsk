@@ -37,7 +37,6 @@ dislocations = dxa_run['dislocations.msgpack']
 # Network summary.
 print(dislocations.df('main_listing'))
 
-# Burgers vector of each extracted dislocation segment.
 segments = dislocations.df('export.DislocationExporter.segments')
 print(segments[['segment_id', 'burgers_vector', 'magnitude', 'length']].to_string(index=False))
 
