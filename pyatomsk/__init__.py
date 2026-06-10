@@ -15,7 +15,7 @@ from voltsdk import (
     open_in_volt,
 )
 
-from pyatomsk.commands import AtomskCommand
+from pyatomsk.commands import AtomskCommand, AtomskError
 from pyatomsk.dislocations import (
     Dislocation,
     DislocationBuilder,
@@ -43,6 +43,7 @@ __all__ = [
     'open_in_volt',
     # Atomsk command builders
     'AtomskCommand',
+    'AtomskError',
     'AtomicStructure',
     'CustomAtomicStructure',
     'CubicLattices',

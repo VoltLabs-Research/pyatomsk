@@ -1,4 +1,3 @@
-import shlex
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -78,9 +77,6 @@ class AtomicStructure(AtomskCommand):
 
         return args
 
-    def to_command(self, *, include_export: bool = True) -> str:
-        return shlex.join(self.argv(include_export=include_export))
-
     def output_path(self) -> Path | None:
         return Path(self.export_filename) if self.export_filename else None
 
@@ -94,7 +90,7 @@ class CustomAtomicStructure(AtomskCommand):
     cell: Sequence[Sequence[float]]
     basis: Sequence[tuple[str, Sequence[float]]]
     duplicate: Sequence[int] | None = None
-    seed_filename: str = 'cementite_unitcell.xsf'
+    seed_filename: str = 'pyatomsk_seed.xsf'
 
     def _seed_text(self) -> str:
         lines = [
@@ -117,14 +113,14 @@ class CustomAtomicStructure(AtomskCommand):
         return path
 
     def argv(self, *, include_export: bool = True) -> list[str]:
+        # ``include_export`` is part of the AtomskCommand contract (so a
+        # CustomAtomicStructure can be fed to DislocationBuilder), but a seed
+        # command has no trailing export clause, so it is a deliberate no-op here.
         args = ['atomsk', str(Path(self.seed_filename))]
         if self.duplicate is not None:
             args.append('-duplicate')
             args.extend(map(str, self.duplicate))
         return args
-
-    def to_command(self, *, include_export: bool = True) -> str:
-        return shlex.join(self.argv(include_export=include_export))
 
     def prepare_run(self) -> None:
         self.write_seed()

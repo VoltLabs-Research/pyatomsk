@@ -9,11 +9,10 @@ from pyatomsk import (
     view,
 )
 
-REGISTRY_URL = 'https://raw.githubusercontent.com/VoltLabs-Research/Volt/main/server/static/plugin-registry'
 LAMMPS_FILE = Path('Al_loop.lmp')
 OUTPUT_DIR = Path('output/fcc-dxa')
 
-hub = PluginHub(url=REGISTRY_URL, default_publisher='voltlabs')
+hub = PluginHub(default_publisher='voltlabs')   # uses registry.voltcloud.dev by default
 ptm = hub.get('polyhedral-template-matching')
 dxa = hub.get('opendxa')
 
@@ -48,11 +47,13 @@ ptm_run = ptm(
     crystal_structure=CubicLattices.FCC.value,
     rmsd=0.1,
 )
-# PTM runs do not carry runtime lattices, so reference_topology stays explicit;
-# the annotated dump and cluster tables are auto-wired from ptm_run.
+# PTM runs do not carry runtime lattices, so reference_topology stays explicit.
+# Wire PTM's annotated dump and cluster tables into DXA explicitly.
 dxa_run = dxa(
-    ptm_run,
+    ptm_run['annotated.dump'],
     output_dir=OUTPUT_DIR,
+    clusters_table=ptm_run['clusters.table'],
+    clusters_transitions=ptm_run['cluster_transitions.table'],
     reference_topology=CubicLattices.FCC.value,
     export_as='json',
 )

@@ -93,7 +93,7 @@ class DislocationBuilder(AtomskCommand):
     dislocations: list[DislocationSpec] = field(default_factory=list)
     options: list[str] = field(default_factory=list)
 
-    def argv(self) -> list[str]:
+    def argv(self, *, include_export: bool = True) -> list[str]:
         command = list(self.atomic_structure.argv(include_export=self.output_file is None))
 
         for dislocation in self.dislocations:
@@ -102,7 +102,7 @@ class DislocationBuilder(AtomskCommand):
         if self.options:
             command.extend(self.options)
 
-        if self.output_file:
+        if include_export and self.output_file:
             command.append(self.output_file)
             command.extend(self.formats)
 

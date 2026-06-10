@@ -32,7 +32,12 @@ def _cache_dir() -> Path:
 def _extract(archive: Path, target: Path) -> None:
     if archive.name.endswith('.tar.gz'):
         with tarfile.open(archive, 'r:gz') as tar:
-            tar.extractall(target)
+            # ``filter='data'`` (Python 3.12+) rejects unsafe members; older
+            # interpreters fall back to the historical behaviour.
+            if hasattr(tarfile, 'data_filter'):
+                tar.extractall(target, filter='data')
+            else:
+                tar.extractall(target)
     elif archive.suffix == '.zip':
         with zipfile.ZipFile(archive) as zf:
             zf.extractall(target)

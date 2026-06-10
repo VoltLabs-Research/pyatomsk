@@ -4,6 +4,24 @@ from pathlib import Path
 from typing import Any
 
 
+class AtomskError(RuntimeError):
+    """Raised when the ``atomsk`` subprocess exits with a non-zero status.
+
+    Carries the executed ``command``, the ``returncode`` and the captured
+    ``stderr`` so failures are debuggable without re-running by hand.
+    """
+
+    def __init__(self, command: list[str], returncode: int, stderr: str) -> None:
+        self.command = command
+        self.returncode = returncode
+        self.stderr = stderr
+        message = f'atomsk failed (exit {returncode}).\n$ {shlex.join(command)}'
+        detail = (stderr or '').strip()
+        if detail:
+            message += f'\n{detail}'
+        super().__init__(message)
+
+
 def _prepare_output_path(path: str | Path) -> Path:
     target = Path(path).expanduser()
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -17,11 +35,11 @@ def _prepare_output_path(path: str | Path) -> Path:
 class AtomskCommand:
     """Base for objects that generate (and run) an ``atomsk`` command."""
 
-    def argv(self) -> list[str]:
+    def argv(self, *, include_export: bool = True) -> list[str]:
         raise NotImplementedError
 
-    def to_command(self) -> str:
-        return shlex.join(self.argv())
+    def to_command(self, *, include_export: bool = True) -> str:
+        return shlex.join(self.argv(include_export=include_export))
 
     def prepare_run(self) -> None:
         """Hook for filesystem prep (seed files, output paths). Default: no-op."""
@@ -38,6 +56,11 @@ class AtomskCommand:
         text: bool = True,
         **kwargs: Any,
     ) -> Path | None:
+        """Run the command and return :meth:`output_path` (``None`` if it only prints).
+
+        On a non-zero exit (and ``check=True``, the default) raises
+        :class:`AtomskError` with the captured stderr included in the message.
+        """
         from pyatomsk.atomsk import ensure_atomsk
 
         run_kwargs = dict(kwargs)
@@ -47,5 +70,8 @@ class AtomskCommand:
         self.prepare_run()
         argv = self.argv()
         argv[0] = str(ensure_atomsk())
-        subprocess.run(argv, check=check, text=text, **run_kwargs)
+        completed = subprocess.run(argv, check=False, text=text, **run_kwargs)
+        if check and completed.returncode != 0:
+            stderr = completed.stderr if isinstance(completed.stderr, str) else ''
+            raise AtomskError(argv, completed.returncode, stderr)
         return self.output_path()

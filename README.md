@@ -12,10 +12,9 @@ pip install pyatomsk
 from pathlib import Path
 from pyatomsk import AtomicStructure, CubicLattices, DislocationBuilder, DislocationLoop, PluginHub, view
 
-REGISTRY = 'https://raw.githubusercontent.com/VoltLabs-Research/Volt/main/server/static/plugin-registry'
 OUT = Path('output/fcc-dxa')
 
-hub = PluginHub(url=REGISTRY, default_publisher='voltlabs')
+hub = PluginHub(default_publisher='voltlabs')   # uses registry.voltcloud.dev by default
 ptm = hub.get('polyhedral-template-matching')
 dxa = hub.get('opendxa')
 
@@ -32,9 +31,16 @@ loop = DislocationLoop(x='0.501*box', y='0.501*box', z='0.501*box',
 builder = DislocationBuilder(atomic_structure=structure, output_file='Al_loop.lmp', dislocations=[loop])
 lmp = builder.run()                      # downloads Atomsk if needed, returns the output Path
 
-# 2. Run the analysis plugins locally.
+# 2. Run the analysis plugins locally. DXA consumes PTM's annotated dump and tables.
 ptm_run = ptm(lmp, output_dir=OUT, crystal_structure='fcc', rmsd=0.1)
-dxa_run = dxa(ptm_run, output_dir=OUT, reference_topology='fcc', export_as='json')
+dxa_run = dxa(
+    ptm_run['annotated.dump'],
+    output_dir=OUT,
+    clusters_table=ptm_run['clusters.table'],
+    clusters_transitions=ptm_run['cluster_transitions.table'],
+    reference_topology='fcc',
+    export_as='json',
+)
 
 # 3. Inspect results as a DataFrame, then view them in VOLT.
 print(dxa_run['dislocations.json'].df())
@@ -103,9 +109,22 @@ run['clusters.table'].df()     # pandas DataFrame
 run['atoms.msgpack'].json()    # parsed payload
 ```
 
-OpenDXA auto-wires from a previous run: `dxa(ptm_run, reference_topology='fcc')` pulls the
-annotated dump and cluster tables automatically. After a `pattern-structure-matching` run,
-`dxa(psm_run)` also infers `reference_topology` and `lattice_dir` from the run's lattices.
+Artifacts are `os.PathLike`, so you wire one plugin's outputs into the next by passing them
+explicitly. OpenDXA takes the annotated dump as its input plus the PTM/PSM cluster tables:
+
+```python
+dxa_run = dxa(
+    ptm_run['annotated.dump'],
+    output_dir='out',
+    clusters_table=ptm_run['clusters.table'],
+    clusters_transitions=ptm_run['cluster_transitions.table'],
+    reference_topology='fcc',
+)
+```
+
+After a `pattern-structure-matching` run, read `lattice_dir` and `reference_topology` from the
+PSM manifest (`psm_run['pattern_structure_matching_manifest.json'].json()`) and pass them to
+`dxa(...)` — see `examples/dislocations/Martensita-BCT/`.
 
 ## Viewing in VOLT
 
@@ -140,7 +159,8 @@ view(dxa_run['defect_mesh.json'], exporter='MeshExporter')      # force a specif
 | `CubicLattices`, `TetragonalLattices`, `HexagonalLattices` | Lattice type enums. |
 | `Dislocation`, `DislocationLoop` | `-dislocation` command fragments. |
 | `DislocationBuilder` | Combine a structure with one or more dislocations. |
-| `AtomskCommand` | Base class: `.argv()`, `.to_command()`, `.run() -> Path`. |
+| `AtomskCommand` | Base class: `.argv()`, `.to_command()`, `.run() -> Path \| None`. |
+| `AtomskError` | Raised when the `atomsk` subprocess exits non-zero (carries `command`, `returncode`, `stderr`). |
 | `view(source, *, output_path=None, …)` | Open an artifact/GLB/list in the VOLT canvas. |
 | `PluginHub`, `Plugin`, `PluginRun`, `PluginArtifact`, `SpatialAssembler`, `open_in_volt` | Re-exported from voltsdk. |
 
