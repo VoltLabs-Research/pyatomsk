@@ -33,7 +33,6 @@ edge = Dislocation(
     character=DislocationCharacter.EDGE_ADD,
     p1='0.501*box',
     p2='0.501*box',
-    # t = (0, 0, 1)
     line='z',
     plane='y',
     burgers=[A],
@@ -64,15 +63,13 @@ psm_run = psm(LAMMPS_FILE, output_dir=OUTPUT_DIR, pattern_definitions=[bct.to_pa
 manifest = psm_run['pattern_structure_matching_manifest.json'].json()
 
 dxa_run = dxa(
-    psm_run['annotated.dump'],
+    psm_run,
     output_dir=OUTPUT_DIR,
-    clusters_table=psm_run['clusters.table'],
-    clusters_transitions=psm_run['cluster_transitions.table'],
     lattice_dir=manifest['opendxa_lattice_dir'],
     reference_topology=manifest['reference_topology'],
 )
 
-dislocations = dxa_run['dislocations.msgpack']
+dislocations = dxa_run['dislocations']
 
 print(dislocations.df('main_listing'))
 
@@ -80,5 +77,5 @@ segments = dislocations.df('export.DislocationExporter.segments')
 print(segments[['segment_id', 'burgers_vector', 'magnitude', 'length']].to_string(index=False))
 
 
-view(dxa_run['dislocations.msgpack'], output_path=OUTPUT_DIR / 'dislocations.glb')
-view(dxa_run['defect_mesh.msgpack'], output_path=OUTPUT_DIR / 'defect_mesh.glb')
+view(dxa_run['dislocations'], output_path=OUTPUT_DIR / 'dislocations.glb')
+view(dxa_run['defect_mesh'], output_path=OUTPUT_DIR / 'defect_mesh.glb')

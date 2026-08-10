@@ -17,24 +17,18 @@ dxa = hub.get('opendxa')
 ptm_run = ptm(
     LAMMPS_FILE,
     output_dir=OUTPUT_DIR,
-    crystal_structure=CubicLattices.SC.value,
+    crystal_structure=CubicLattices.SC,
     rmsd=0.1,
-    logs=True,
 )
 
 dxa_run = dxa(
-    ptm_run['annotated.dump'],
+    ptm_run,
     output_dir=OUTPUT_DIR,
-    clusters_table=ptm_run['clusters.table'],
-    clusters_transitions=ptm_run['cluster_transitions.table'],
-    lattice_dir=dxa.root / 'share' / 'volt' / 'lattices',
-    reference_topology=CubicLattices.SC.value,
-    logs=True,
+    reference_topology=CubicLattices.SC,
 )
 
-dislocations = dxa_run['dislocations.msgpack']
+dislocations = dxa_run['dislocations']
 
-# Network summary.
 print(dislocations.df('main_listing'))
 
 segments = dislocations.df('export.DislocationExporter.segments')

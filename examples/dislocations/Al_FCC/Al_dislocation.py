@@ -12,11 +12,10 @@ from pyatomsk import (
 LAMMPS_FILE = Path('Al_loop.lmp')
 OUTPUT_DIR = Path('output/fcc-dxa')
 
-hub = PluginHub(default_publisher='voltlabs')   # uses registry.voltcloud.dev by default
+hub = PluginHub(default_publisher='voltlabs')
 ptm = hub.get('polyhedral-template-matching')
 dxa = hub.get('opendxa')
 
-# Build an FCC Al slab with a prismatic dislocation loop via Atomsk.
 structure = AtomicStructure(
     lattice=CubicLattices.FCC,
     lattice_params=[4.06],
@@ -40,26 +39,19 @@ builder = DislocationBuilder(
 )
 builder.run()
 
-# Local plugin compute: PTM classifies the structure, then DXA extracts dislocations.
 ptm_run = ptm(
     LAMMPS_FILE,
     output_dir=OUTPUT_DIR,
-    crystal_structure=CubicLattices.FCC.value,
+    crystal_structure=CubicLattices.FCC,
     rmsd=0.1,
 )
-# PTM runs do not carry runtime lattices, so reference_topology stays explicit.
-# Wire PTM's annotated dump and cluster tables into DXA explicitly.
 dxa_run = dxa(
-    ptm_run['annotated.dump'],
+    ptm_run,
     output_dir=OUTPUT_DIR,
-    clusters_table=ptm_run['clusters.table'],
-    clusters_transitions=ptm_run['cluster_transitions.table'],
-    reference_topology=CubicLattices.FCC.value,
-    export_as='json',
+    reference_topology=CubicLattices.FCC,
 )
 
-print(dxa_run['dislocations.json'].df())
+print(dxa_run['dislocations'].df('main_listing'))
 
-# View the results in VOLT (compute stays local; the viewer is a local http server).
-view(ptm_run['atoms.msgpack'], output_path=OUTPUT_DIR / 'ptm_atoms.glb')
-view(dxa_run['dislocations.json'])
+view(ptm_run['atoms'], output_path=OUTPUT_DIR / 'ptm_atoms.glb')
+view(dxa_run['dislocations'])
