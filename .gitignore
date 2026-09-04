@@ -25,3 +25,9 @@ htmlcov/
 
 output/
 CLAUDE.md
+# Repowise
+.repowise
+
+# MCP and Claude
+.mcp.json
+.claude
